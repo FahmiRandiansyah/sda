@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistem Inventori Gudang - AVL Tree & Merge Sort</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body class="bg-slate-50 font-sans text-slate-800">
+    <nav
+      class="bg-indigo-700 text-white shadow-md px-6 py-4 flex justify-between items-center"
+    >
+      <div class="flex items-center space-x-3">
+        <i class="fa-solid fa-boxes-stacked text-2xl"></i>
+        <span class="text-xl font-bold tracking-wide">InvenTree 1.0</span>
+      </div>
+      <div
+        class="text-sm bg-indigo-800 px-4 py-2 rounded-lg border border-indigo-500"
+      >
+        Mata Kuliah:
+        <span class="font-semibold text-amber-300"
+          >Struktur Data & Algoritma</span
+        >
+      </div>
+    </nav>
+
+    <main
+      class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8"
+    >
+      <div class="space-y-6 lg:col-span-1">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <h2
+            class="text-lg font-bold text-slate-900 mb-4 flex items-center space-x-2"
+          >
+            <i class="fa-solid fa-square-plus text-indigo-600"></i>
+            <span>Tambah / Update Barang</span>
+          </h2>
+          <form id="formBarang" class="space-y-4">
+            <div>
+              <label
+                class="block text-xs font-semibold uppercase text-slate-500 mb-1"
+                >ID Barang (Kode Unik)</label
+              >
+              <input
+                type="text"
+                id="id_barang"
+                required
+                placeholder="Contoh: BRG001"
+                class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-semibold uppercase text-slate-500 mb-1"
+                >Nama Barang</label
+              >
+              <input
+                type="text"
+                id="nama_barang"
+                required
+                placeholder="Contoh: Laptop ASUS ROG"
+                class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-semibold uppercase text-slate-500 mb-1"
+                >Kategori</label
+              >
+              <input
+                type="text"
+                id="kategori_barang"
+                placeholder="Contoh: Elektronik"
+                class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  class="block text-xs font-semibold uppercase text-slate-500 mb-1"
+                  >Stok Awal</label
+                >
+                <input
+                  type="number"
+                  id="stok_barang"
+                  min="0"
+                  required
+                  placeholder="0"
+                  class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-semibold uppercase text-slate-500 mb-1"
+                  >Harga (Rp)</label
+                >
+                <input
+                  type="number"
+                  id="harga_barang"
+                  min="0"
+                  required
+                  placeholder="0"
+                  class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 px-4 rounded-xl shadow-md transition flex items-center justify-center space-x-2"
+            >
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Simpan ke AVL Tree</span>
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <h2
+            class="text-lg font-bold text-slate-900 mb-4 flex items-center space-x-2"
+          >
+            <i class="fa-solid fa-magnifying-glass text-amber-500"></i>
+            <span>Pencarian AVL</span>
+          </h2>
+          <div class="flex space-x-2">
+            <input
+              type="text"
+              id="cari_id"
+              placeholder="Masukkan ID Barang..."
+              class="flex-1 px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 transition"
+            />
+            <button
+              onclick="cariBarang()"
+              class="bg-amber-500 hover:bg-amber-600 text-white font-medium px-4 py-2 rounded-xl transition"
+            >
+              Cari
+            </button>
+          </div>
+          <div
+            id="hasil_cari"
+            class="mt-4 hidden p-3 rounded-xl border transition-all"
+          ></div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2 space-y-6">
+        <div
+          class="bg-gradient-to-r from-indigo-800 to-indigo-600 text-white p-4 rounded-2xl shadow-sm flex justify-between items-center"
+        >
+          <div>
+            <h3 class="text-sm font-medium opacity-80">
+              Total Varian Barang Saat Ini
+            </h3>
+            <p id="total_items" class="text-3xl font-extrabold mt-1">0</p>
+          </div>
+          <div class="text-right">
+            <span
+              class="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-sm"
+            >
+              Struktur Data: Self-Balancing AVL
+            </span>
+          </div>
+        </div>
+
+        <div
+          class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap gap-4 items-center justify-between"
+        >
+          <div class="flex items-center space-x-2">
+            <span class="text-sm font-semibold text-slate-500">Urutkan:</span>
+            <select
+              id="sort_select"
+              onchange="loadTableData()"
+              class="px-3 py-1.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50 text-sm"
+            >
+              <option value="">Bawaan Pohon (Inorder ID)</option>
+              <option value="stok">Stok Tersedikit</option>
+              <option value="harga">Harga Termurah</option>
+            </select>
+          </div>
+          <button
+            onclick="loadTableData()"
+            class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center space-x-1"
+          >
+            <i class="fa-solid fa-rotate"></i> <span>Refresh Data</span>
+          </button>
+        </div>
+
+        <div
+          class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"
+        >
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr
+                  class="bg-slate-50 text-slate-500 text-xs font-bold uppercase tracking-wider border-b border-slate-100"
+                >
+                  <th class="py-3 px-4">ID Barang</th>
+                  <th class="py-3 px-4">Nama Barang</th>
+                  <th class="py-3 px-4">Kategori</th>
+                  <th class="py-3 px-4">Stok</th>
+                  <th class="py-3 px-4">Harga Unit</th>
+                  <th class="py-3 px-4 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody
+                id="tabel_body"
+                class="divide-y divide-slate-100 text-sm text-slate-700"
+              ></tbody>
+            </table>
+          </div>
+          <div id="empty_state" class="p-8 text-center text-slate-400 hidden">
+            <i class="fa-regular fa-folder-open text-4xl mb-2 block"></i>
+            Belum ada data di dalam gudang inventori.
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer
+      class="text-center py-8 text-xs text-slate-400 mt-12 border-t border-slate-200 bg-white"
+    >
+      Proyek Akhir Struktur Data dan Algoritma &copy; 2026.
+    </footer>
+
+    <script>
+      const formBarang = document.getElementById("formBarang");
+      const tabelBody = document.getElementById("tabel_body");
+      const emptyState = document.getElementById("empty_state");
+      const totalItems = document.getElementById("total_items");
+      const sortSelect = document.getElementById("sort_select");
+      const hasilCari = document.getElementById("hasil_cari");
+
+      formBarang.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const data = {
+          id: document.getElementById("id_barang").value,
+          nama: document.getElementById("nama_barang").value,
+          kategori: document.getElementById("kategori_barang").value,
+          stok: parseInt(document.getElementById("stok_barang").value),
+          harga: parseFloat(document.getElementById("harga_barang").value),
+        };
+
+        const response = await fetch("/api/barang", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await response.json();
+
+        if (result.success) {
+          alert(result.message);
+          formBarang.reset();
+          loadTableData();
+        } else {
+          alert("Gagal: " + result.message);
+        }
+      });
+
+      async function loadTableData() {
+        const sortBy = sortSelect.value;
+        let url = "/api/barang";
+        if (sortBy) url += `?sort_by=${sortBy}`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        totalItems.innerText = data.length;
+        tabelBody.innerHTML = "";
+
+        if (data.length === 0) {
+          emptyState.classList.remove("hidden");
+          return;
+        } else {
+          emptyState.classList.add("hidden");
+        }
+
+        data.forEach((item) => {
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-slate-50/80 transition";
+          tr.innerHTML = `
+                    <td class="py-3 px-4 font-mono text-xs text-indigo-600 font-bold">${item.id}</td>
+                    <td class="py-3 px-4 font-medium text-slate-900">${item.nama}</td>
+                    <td class="py-3 px-4"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded-full">${item.kategori || "-"}</span></td>
+                    <td class="py-3 px-4 font-semibold ${item.stok <= 5 ? "text-rose-600" : "text-slate-700"}">${item.stok}</td>
+                    <td class="py-3 px-4 font-medium">Rp ${item.harga.toLocaleString("id-ID")}</td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="hapusBarang('${item.id}')" class="text-rose-500 hover:text-rose-700 p-1 transition">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+          tabelBody.appendChild(tr);
+        });
+      }
+
+      async function hapusBarang(id) {
+        if (
+          !confirm(`Apakah Anda yakin ingin menghapus barang dengan ID ${id}?`)
+        )
+          return;
+        const response = await fetch(`/api/barang/${id}`, { method: "DELETE" });
+        const result = await response.json();
+        alert(result.message);
+        loadTableData();
+      }
+
+      async function cariBarang() {
+        const id = document.getElementById("cari_id").value.trim();
+        if (!id) {
+          alert("Masukkan ID barang yang ingin dicari!");
+          return;
+        }
+
+        hasilCari.classList.remove("hidden");
+        hasilCari.innerHTML = `<span class="text-xs text-slate-400"><i class="fa-solid fa-spinner animate-spin"></i> Mencari...</span>`;
+
+        const response = await fetch(`/api/barang/cari/${id}`);
+        const result = await response.json();
+
+        if (result.success) {
+          hasilCari.className =
+            "mt-4 p-4 rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-900 text-xs space-y-1";
+          hasilCari.innerHTML = `
+                    <div class="font-bold text-sm text-emerald-800"><i class="fa-solid fa-circle-check"></i> Data Ditemukan!</div>
+                    <div><strong>ID:</strong> ${result.data.id}</div>
+                    <div><strong>Nama:</strong> ${result.data.nama}</div>
+                    <div><strong>Kategori:</strong> ${result.data.kategori || "-"}</div>
+                    <div><strong>Stok:</strong> ${result.data.stok} unit</div>
+                    <div><strong>Harga:</strong> Rp ${result.data.harga.toLocaleString("id-ID")}</div>
+                `;
+        } else {
+          hasilCari.className =
+            "mt-4 p-4 rounded-xl border border-rose-100 bg-rose-50 text-rose-900 text-xs";
+          hasilCari.innerHTML = `<div class="font-bold"><i class="fa-solid fa-circle-xmark"></i> ${result.message}</div>`;
+        }
+      }
+
+      loadTableData();
+    </script>
+  </body>
+</html>

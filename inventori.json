@@ -1,0 +1,30 @@
+[
+    {
+        "id": "BRG001",
+        "nama": "Infinix Hot 60 Pro",
+        "kategori": "Elektronik",
+        "stok": 100,
+        "harga": 2300000.0
+    },
+    {
+        "id": "BRG002",
+        "nama": "Astrea Legenda 2",
+        "kategori": "Kendaraan",
+        "stok": 1,
+        "harga": 4500000.0
+    },
+    {
+        "id": "BRG003",
+        "nama": "Mouse Wireless Logitech",
+        "kategori": "Aksesoris",
+        "stok": 25,
+        "harga": 220000.0
+    },
+    {
+        "id": "BRG004",
+        "nama": "MacBook Pro M3",
+        "kategori": "Elektronik",
+        "stok": 8,
+        "harga": 25000000.0
+    }
+]
